@@ -1,0 +1,305 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Dashboard - MegaPartyLED</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            color: #1e3a8a;
+            font-family: 'Inter', sans-serif;
+        }
+        .section-toggle {
+            background-color: #fd9bac;
+            color: #1e3a8a;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .section-toggle:hover {
+            background-color: #f9a8b4;
+        }
+        .section-content {
+            display: none;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .section-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th {
+            background-color: #1e3a8a;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="p-6 max-w-5xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center">Análisis SEO de megapartyled.cl</h1>
+
+    <!-- SEO On-Page Section -->
+    <div class="mb-4">
+        <div class="section-toggle font-semibold" onclick="toggleSection('onPageContent')">1. Análisis SEO On-Page</div>
+        <div id="onPageContent" class="section-content mt-2">
+            <h2 class="text-xl font-semibold mb-2">1.1. Contenido</h2>
+            <p><strong>Fortalezas:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>El sitio ofrece información clara sobre los servicios (fiestas móviles, DJ, iluminación, show de Robot LED, etc.).</li>
+                <li>Incluye una galería y secciones de contacto, lo que mejora la experiencia del usuario.</li>
+            </ul>
+            <p><strong>Debilidades:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>Falta de optimización de palabras clave: No se observa una estrategia clara de uso de palabras clave relevantes como "fiestas móviles Santiago", "DJ para eventos Chile" o "show de luces LED".</li>
+                <li>Contenido escaso: Las descripciones de servicios son breves y no aprovechan términos de cola larga.</li>
+                <li>Falta de blog o contenido dinámico: No hay una sección de blog o artículos que refuercen la autoridad del sitio.</li>
+            </ul>
+            <h2 class="text-xl font-semibold mb-2">1.2. Títulos y Metaetiquetas</h2>
+            <p><strong>Fortalezas:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>El título de la página principal es atractivo y menciona la experiencia de la empresa.</li>
+            </ul>
+            <p><strong>Debilidades:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>Títulos no optimizados: No incluyen palabras clave específicas para SEO local.</li>
+                <li>Meta descripciones genéricas: No son específicas ni atractivas para mejorar el CTR.</li>
+                <li>Uso inconsistente de dominios: Hay referencias a "megapartyled.com" en lugar de "megapartyled.cl".</li>
+            </ul>
+            <h2 class="text-xl font-semibold mb-2">1.3. Estructura de URL y Encabezados</h2>
+            <p><strong>Fortalezas:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>La estructura del sitio parece simple, con secciones claras.</li>
+            </ul>
+            <p><strong>Debilidades:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>URLs no optimizadas: No incluyen palabras clave descriptivas.</li>
+                <li>Uso limitado de encabezados (H1, H2, H3): Falta jerarquía clara.</li>
+            </ul>
+            <h2 class="text-xl font-semibold mb-2">1.4. Optimización para móviles</h2>
+            <p><strong>Debilidades:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>No hay información específica sobre la adaptabilidad del sitio a dispositivos móviles, crucial para el ranking en Google.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SEO Técnico Section -->
+    <div class="mb-4">
+        <div class="section-toggle font-semibold" onclick="toggleSection('technicalContent')">2. Análisis SEO Técnico</div>
+        <div id="technicalContent" class="section-content mt-2">
+            <h2 class="text-xl font-semibold mb-2">2.1. Velocidad de carga</h2>
+            <p><strong>Debilidades:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>No se proporciona información específica sobre la velocidad de carga, pero sitios similares tienden a ser lentos si no están optimizados.</li>
+                <li>Las imágenes de alta calidad deben estar comprimidas y usar formatos como WebP.</li>
+            </ul>
+            <h2 class="text-xl font-semibold mb-2">2.2. Seguridad</h2>
+            <p><strong>Fortalezas:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>El sitio utiliza HTTPS, positivo para la seguridad y el SEO.</li>
+            </ul>
+            <p><strong>Debilidades:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>No se menciona si el certificado SSL está actualizado o si hay configuraciones como HSTS.</li>
+            </ul>
+            <h2 class="text-xl font-semibold mb-2">2.3. Indexación y rastreo</h2>
+            <p><strong>Debilidades:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>Falta de sitemap.xml y robots.txt, esenciales para guiar a los motores de búsqueda.</li>
+                <li>Enlaces rotos deben verificarse para evitar errores 404.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SEO Off-Page Section -->
+    <div class="mb-4">
+        <div class="section-toggle font-semibold" onclick="toggleSection('offPageContent')">3. Análisis SEO Off-Page</div>
+        <div id="offPageContent" class="section-content mt-2">
+            <h2 class="text-xl font-semibold mb-2">3.1. Backlinks</h2>
+            <p><strong>Fortalezas:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>El sitio aparece en plataformas como timbrit.cl, indicando presencia en directorios locales.</li>
+            </ul>
+            <p><strong>Debilidades:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>Pocos backlinks de calidad: No hay evidencia de una estrategia de construcción de enlaces.</li>
+                <li>Reputación online limitada: No hay reseñas visibles en Google My Business o similares.</li>
+            </ul>
+            <h2 class="text-xl font-semibold mb-2">3.2. Presencia en redes sociales</h2>
+            <p><strong>Fortalezas:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>Hay una página de Facebook asociada ("Mega Cl").</li>
+            </ul>
+            <p><strong>Debilidades:</strong></p>
+            <ul class="list-disc pl-5 mb-2">
+                <li>No se menciona una estrategia activa en Instagram o TikTok.</li>
+                <li>Falta de integración de redes sociales en el sitio web.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Mejoras Recomendadas Section -->
+    <div class="mb-4">
+        <div class="section-toggle font-semibold" onclick="toggleSection('recommendationsContent')">4. Mejoras Recomendadas</div>
+        <div id="recommendationsContent" class="section-content mt-2">
+            <ul class="list-decimal pl-5">
+                <li><strong>Investigación y optimización de palabras clave:</strong> Análisis de palabras clave locales e incorporación en títulos, meta descripciones, encabezados y contenido.</li>
+                <li><strong>Mejorar el contenido:</strong> Crear una sección de blog y ampliar descripciones de servicios con palabras clave de cola larga.</li>
+                <li><strong>Optimización técnica:</strong> Comprimir imágenes, usar WebP, implementar sitemap.xml, robots.txt, corregir enlaces rotos, asegurar diseño responsive.</li>
+                <li><strong>Mejorar títulos y metaetiquetas:</strong> Usar títulos únicos (máx. 60 caracteres) y meta descripciones atractivas (máx. 160 caracteres).</li>
+                <li><strong>Estrategia de backlinks:</strong> Crear perfiles en directorios locales y buscar colaboraciones con blogs o influencers.</li>
+                <li><strong>Presencia en redes sociales:</strong> Crear perfiles en Instagram/TikTok e integrar botones de redes sociales en el sitio.</li>
+                <li><strong>Optimización de velocidad:</strong> Usar Google PageSpeed Insights y implementar lazy loading.</li>
+                <li><strong>SEO local:</strong> Optimizar perfil en Google My Business y mantener información de contacto consistente.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Cotización Detallada Section -->
+    <div class="mb-4">
+        <div class="section-toggle font-semibold" onclick="toggleSection('quotationContent')">5. Cotización Detallada</div>
+        <div id="quotationContent" class="section-content mt-2">
+            <table class="mb-4">
+                <thead>
+                    <tr>
+                        <th>Servicio</th>
+                        <th>Descripción</th>
+                        <th>Costo Estimado (USD)</th>
+                        <th>Tiempo Estimado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Análisis de palabras clave</td>
+                        <td>Investigación de palabras clave locales y de cola larga para eventos en Santiago.</td>
+                        <td>$0</td>
+                        <td>3 semanas</td>
+                    </tr>
+                    <tr
+
+                    >
+                        <td>Optimización de contenido on-page</td>
+                        <td>Redacción de 5 páginas optimizadas + metaetiquetas para todas las secciones.</td>
+                        <td>$150</td>
+                        <td>3 semanas</td>
+                    </tr>
+                    <tr>
+                        <td>Creación de blog</td>
+                        <td>Desarrollo de 5 artículos de 800 palabras optimizados para SEO.</td>
+                        <td>$100</td>
+                        <td>3 semanas</td>
+                    </tr>
+                    <tr>
+                        <td>Optimización técnica</td>
+                        <td>Creación de sitemap.xml, robots.txt, compresión de imágenes, lazy loading.</td>
+                        <td>$0</td>
+                        <td>3 semanas</td>
+                    </tr>
+                    <tr>
+                        <td>Optimización para móviles</td>
+                        <td>Ajustes para garantizar diseño responsive.</td>
+                        <td>$50</td>
+                        <td>3 semanas</td>
+                    </tr>
+                    <tr>
+                        <td>Estrategia de backlinks</td>
+                        <td>Creación de 10 backlinks de calidad en directorios y colaboraciones locales.</td>
+                        <td>$50</td>
+                        <td>3 semanas</td>
+                    </tr>
+                    <tr>
+                        <td>SEO local (Google My Business)</td>
+                        <td>Configuración y optimización de perfil en Google My Business.</td>
+                        <td>$150</td>
+                        <td>3 semanas</td>
+                    </tr>
+                    <tr>
+                        <td>Auditoría de velocidad</td>
+                        <td>Análisis con PageSpeed Insights y corrección de problemas de rendimiento.</td>
+                        <td>$100</td>
+                        <td>3 semanas</td>
+                    </tr>
+                    <tr>
+                        <td>Mantenimiento mensual</td>
+                        <td>Seguimiento de métricas SEO, actualización de contenido y backlinks.</td>
+                        <td>$100/mes</td>
+                        <td>Mensual</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td></td>
+                        <td><strong>$600 + $100/mes</strong></td>
+                        <td><strong>12 semanas</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>Notas:</strong></p>
+            <ul class="list-disc pl-5">
+                <li>El mantenimiento mensual es opcional, pero recomendado para mantener el posicionamiento.</li>
+                <li>Se recomienda usar herramientas como Google Analytics y Search Console para medir el progreso.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
